@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Game Tebak Kata</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        margin-top: 50px;
+      }
+      input {
+        padding: 8px;
+      }
+      button {
+        padding: 8px 15px;
+        cursor: pointer;
+      }
+      #hasil {
+        font-weight: bold;
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container" id="game-screen">
+      <h2>🏆 Tantangan 100 Poin</h2>
+      <div class="progress-bar"><div id="progress-fill"></div></div>
+      <p style="font-weight: bold">Skor: <span id="skor">0</span> / 100</p>
+
+      <div id="soal-box">Memuat soal cerita...</div>
+
+      <input
+        type="number"
+        id="inputJawaban"
+        placeholder="Ketik jawaban..."
+        onkeypress="handleKeyPress(event)"
+      />
+      <button onclick="cekJawaban()">Kirim Jawaban</button>
+      <p id="hasil"></p>
+    </div>
+
+    <div class="container" id="congrats-screen">
+      <div class="emoji-win">👑</div>
+      <h2>SELAMAT</h2>
+      <p>Kamu berhasil mengumpulkan <strong>100 Poin</strong>!</p>
+      <button onclick="resetGame()" style="background: #00b894">
+        Main Lagi
+      </button>
+    </div>
+
+    <script>
+      let jawabanBenar;
+      let totalSkor = 0;
+
+      function handleKeyPress(e) {
+        if (e.key === "Enter") cekJawaban();
+      }
+
+      function generateSoal() {
+        if (totalSkor >= 100) {
+          tampilkanMenang();
+          return;
+        }
+
+        document.getElementById("inputJawaban").value = "";
+        document.getElementById("hasil").innerHTML = "";
+        document.getElementById("inputJawaban").focus();
+
+        const nama = ["Budi", "Siti", "Edo", "Lani", "Andi", "Rara"][
+          Math.floor(Math.random() * 6)
+        ];
+        const benda = [
+          "donat",
+          "kelereng",
+          "buku",
+          "jeruk",
+          "pensil",
+          "permen",
+        ][Math.floor(Math.random() * 6)];
+
+        const jenisSoal = Math.floor(Math.random() * 4);
+        let a, b;
+
+        switch (jenisSoal) {
+          case 0:
+            a = Math.floor(Math.random() * 40) + 10;
+            b = Math.floor(Math.random() * 20) + 4;
+            document.getElementById("soal-box").innerHTML =
+              `${nama} membawa ${a} ${benda}, lalu diberi ${b} ${benda} lagi oleh Ibu. Berapa totalnya?`;
+            jawabanBenar = a + b;
+            break;
+          case 1:
+            a = Math.floor(Math.random() * 30) + 20;
+            b = Math.floor(Math.random() * 15) + 7;
+            document.getElementById("soal-box").innerHTML =
+              `${nama} punya ${a} ${benda}, tapi ${b} buah rusak. Berapa ${benda} yang masih bagus?`;
+            jawabanBenar = a - b;
+            break;
+          case 2:
+            a = Math.floor(Math.random() * 8) + 2;
+            b = Math.floor(Math.random() * 5) + 6;
+            document.getElementById("soal-box").innerHTML =
+              `${nama} membeli ${a} kantong ${benda}. Jika setiap kantong berisi ${b} buah, berapa jumlah seluruhnya?`;
+            jawabanBenar = a * b;
+            break;
+          case 3:
+            b = Math.floor(Math.random() * 4) + 2;
+            jawabanBenar = Math.floor(Math.random() * 6) + 8;
+            a = b * jawabanBenar;
+            document.getElementById("soal-box").innerHTML =
+              `${nama} ingin membagi ${a} ${benda} kepada ${b} temannya secara rata. Berapa buah yang didapat setiap teman?`;
+            break;
+        }
+      }
+
+      function cekJawaban() {
+        const inputElement = document.getElementById("inputJawaban");
+        const userAns = parseInt(inputElement.value);
+        const feedback = document.getElementById("hasil");
+
+        if (isNaN(userAns)) return;
+
+        if (userAns === jawabanBenar) {
+          totalSkor += 20;
+          updateUI();
+          feedback.innerHTML = "✅ Benar!";
+          feedback.style.color = "#00b894";
+
+          if (totalSkor >= 100) {
+            setTimeout(tampilkanMenang, 500);
+          } else {
+            setTimeout(generateSoal, 1200);
+          }
+        } else {
+          feedback.innerHTML = "❌ Salah";
+          feedback.style.color = "#e74c3c";
+          inputElement.select();
+        }
+      }
+
+      function updateUI() {
+        document.getElementById("skor").innerText = totalSkor;
+        document.getElementById("progress-fill").style.width = totalSkor + "%";
+      }
+
+      function tampilkanMenang() {
+        document.getElementById("game-screen").style.display = "none";
+        document.getElementById("congrats-screen").style.display = "block";
+      }
+
+      function resetGame() {
+        totalSkor = 0;
+        updateUI();
+        document.getElementById("game-screen").style.display = "block";
+        document.getElementById("congrats-screen").style.display = "none";
+        generateSoal();
+      }
+
+      generateSoal();
+    </script>
+  </body>
+</html>
